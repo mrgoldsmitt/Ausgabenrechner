@@ -284,8 +284,8 @@ function render() {
                 </div>
                 <div class="expense-actions">
                     <span class="expense-amount" style="color: var(--color-primary);">${formatCurrency(inc.amount)}</span>
-                    <button class="btn-secondary income-edit" data-id="${inc.id}" title="Bearbeiten" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">✎</button>
-                    <button class="btn-danger income-delete" data-id="${inc.id}" title="Löschen">✕</button>
+                    <button class="btn-secondary income-edit" data-id="${inc.id}" title="Bearbeiten" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
+                    <button class="btn-danger income-delete" data-id="${inc.id}" title="Löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                 </div>
             `;
             dom.incomesList.appendChild(li);
@@ -384,8 +384,8 @@ function render() {
                         </div>
                         <div class="expense-actions">
                             <span class="expense-amount">${formatCurrency(exp.amount)}</span>
-                            <button class="btn-secondary expense-edit" data-id="${exp.id}" title="Bearbeiten" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">✎</button>
-                            <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen">✕</button>
+                            <button class="btn-secondary expense-edit" data-id="${exp.id}" title="Bearbeiten" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
+                            <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                         </div>
                     `;
                     dom.expensesList.appendChild(li);
@@ -412,8 +412,8 @@ function render() {
                     </div>
                     <div class="expense-actions">
                         <span class="expense-amount">${formatCurrency(exp.amount)}</span>
-                        <button class="btn-secondary expense-edit" data-id="${exp.id}" title="Bearbeiten" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">✎</button>
-                        <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen">✕</button>
+                        <button class="btn-secondary expense-edit" data-id="${exp.id}" title="Bearbeiten" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
+                        <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 `;
                 dom.expensesList.appendChild(li);
@@ -591,12 +591,13 @@ dom.incomeForm.addEventListener('submit', (e) => {
 
 // Remove or Edit Income (Event Delegation)
 dom.incomesList.addEventListener('click', (e) => {
-    if (e.target.tagName === 'BUTTON') {
-        const id = e.target.getAttribute('data-id');
-        if (e.target.classList.contains('income-delete')) {
+    const btn = e.target.closest('button');
+    if (btn) {
+        const id = btn.getAttribute('data-id');
+        if (btn.classList.contains('income-delete')) {
             removeIncomeXML(id);
             render();
-        } else if (e.target.classList.contains('income-edit')) {
+        } else if (btn.classList.contains('income-edit')) {
             const inc = getIncomes().find(i => i.id === id);
             if (inc) {
                 dom.incomeName.value = inc.name;
@@ -652,12 +653,13 @@ dom.expenseForm.addEventListener('submit', (e) => {
 
 // Remove or Edit Expense (Event Delegation)
 dom.expensesList.addEventListener('click', (e) => {
-    if (e.target.tagName === 'BUTTON') {
-        const id = e.target.getAttribute('data-id');
-        if (e.target.classList.contains('expense-delete') || e.target.classList.contains('btn-danger')) {
+    const btn = e.target.closest('button');
+    if (btn) {
+        const id = btn.getAttribute('data-id');
+        if (btn.classList.contains('expense-delete') || btn.classList.contains('btn-danger')) {
             removeExpenseXML(id);
             render();
-        } else if (e.target.classList.contains('expense-edit')) {
+        } else if (btn.classList.contains('expense-edit')) {
             const exp = getExpenses().find(x => x.id === id);
             if (exp) {
                 dom.expenseName.value = exp.name;
@@ -1462,26 +1464,26 @@ if (window.CryptoSync) {
         authDom.syncStatusBadge.className = 'badge-sync ' + status;
 
         if (status === 'saving') {
-            authDom.syncStatusBadge.innerHTML = '🔄 Wird verschlüsselt & gespeichert...';
+            authDom.syncStatusBadge.innerHTML = '<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Wird verschlüsselt & gespeichert...';
             if (authDom.burgerStatusDot) {
                 authDom.burgerStatusDot.style.display = 'block';
                 authDom.burgerStatusDot.style.backgroundColor = '#ff9900';
             }
         } else if (status === 'pending') {
-            authDom.syncStatusBadge.innerHTML = '⏳ Synchronisation ausstehend...';
+            authDom.syncStatusBadge.innerHTML = '<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Synchronisation ausstehend...';
             if (authDom.burgerStatusDot) {
                 authDom.burgerStatusDot.style.display = 'block';
                 authDom.burgerStatusDot.style.backgroundColor = '#ffaa00';
             }
         } else if (status === 'synced') {
             const timeStr = lastSync ? lastSync.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
-            authDom.syncStatusBadge.innerHTML = `● Gespeichert (${timeStr} Uhr)`;
+            authDom.syncStatusBadge.innerHTML = `<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" style="color: #28a745;"><path d="M20 6 9 17l-5-5"/></svg> Gespeichert (${timeStr} Uhr)`;
             if (authDom.burgerStatusDot) {
                 authDom.burgerStatusDot.style.display = 'block';
                 authDom.burgerStatusDot.style.backgroundColor = '#28a745';
             }
         } else if (status === 'error') {
-            authDom.syncStatusBadge.innerHTML = `⚠️ Sync-Fehler (${message || 'Offline'})`;
+            authDom.syncStatusBadge.innerHTML = `<svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" style="color: #ff4d4d;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Sync-Fehler (${message || 'Offline'})`;
             if (authDom.burgerStatusDot) {
                 authDom.burgerStatusDot.style.display = 'block';
                 authDom.burgerStatusDot.style.backgroundColor = '#ff4d4d';
@@ -1504,3 +1506,13 @@ if (window.CryptoSync) {
         console.warn("Sitzung konnte nicht wiederhergestellt werden:", err);
     }
 })();
+
+
+// PWA Service Worker Registrierung
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('PWA Service Worker registriert:', reg.scope))
+            .catch(err => console.warn('PWA Service Worker Fehler:', err));
+    });
+}

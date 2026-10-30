@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9900" />
+      <stop offset="100%" stop-color="#e65c00" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#fff5eb" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#b34700" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Inner Content Card / Wallet Symbol with Drop Shadow -->
+  <g filter="url(#shadow)">
+    <!-- Main Card Body -->
+    <rect x="76" y="140" width="360" height="240" rx="36" fill="url(#cardGrad)" />
+    
+    <!-- Magnetic Stripe / Accent Top Line -->
+    <path d="M 76 196 L 436 196" stroke="#ffd1a3" stroke-width="8" stroke-linecap="round" />
+
+    <!-- Finance Trend Curve / Rising Bar Chart -->
+    <rect x="136" y="270" width="28" height="65" rx="8" fill="#ffaa00" />
+    <rect x="184" y="240" width="28" height="95" rx="8" fill="#ff8c00" />
+    <rect x="232" y="210" width="28" height="125" rx="8" fill="#e65c00" />
+
+    <!-- Euro Coin Clasp / Security Badge -->
+    <circle cx="360" cy="265" r="46" fill="#ff8c00" stroke="#ffffff" stroke-width="6" />
+    <!-- Euro Symbol in Coin -->
+    <path d="M 374 249 C 354 247 342 255 342 265 C 342 275 354 283 374 281" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+    <line x1="335" y1="261" x2="362" y2="261" stroke="#ffffff" stroke-width="5" stroke-linecap="round" />
+    <line x1="335" y1="269" x2="362" y2="269" stroke="#ffffff" stroke-width="5" stroke-linecap="round" />
+  </g>
+</svg>

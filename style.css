@@ -1,3 +1,44 @@
+
+/* ===== SVG Icons Styling ===== */
+.svg-icon {
+    display: inline-block;
+    vertical-align: -0.15em;
+    width: 1.15em;
+    height: 1.15em;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.svg-icon-sm {
+    width: 0.95em;
+    height: 0.95em;
+}
+
+.svg-icon-lg {
+    width: 1.35em;
+    height: 1.35em;
+}
+
+button svg.svg-icon,
+label svg.svg-icon {
+    margin-right: 0.25rem;
+}
+
+.income-delete svg.svg-icon,
+.income-edit svg.svg-icon,
+.expense-delete svg.svg-icon,
+.expense-edit svg.svg-icon,
+.header-account-btn svg.svg-icon,
+.user-avatar-circle svg.svg-icon,
+.sidebar-logo svg.svg-icon {
+    margin-right: 0;
+}
+
 :root {
     /* Color Palette - Orange focused */
     --color-bg: #ffffff;
@@ -1347,4 +1388,9 @@ button:active, .file-upload-label:active {
         padding: 1.25rem 1rem 2.5rem 1rem;
         max-height: calc(100dvh - 1.5rem);
     }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }

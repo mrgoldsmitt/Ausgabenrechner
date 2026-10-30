@@ -1,0 +1,31 @@
+{
+  "name": "Ausgabenrechner",
+  "short_name": "Ausgaben",
+  "description": "Ausgabenrechner mit Ende-zu-Ende-Verschlüsselung, Cloud-Synchronisation und Szenarien-Verwaltung",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fcfaf7",
+  "theme_color": "#ff8c00",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -13,6 +13,15 @@
     <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Styles -->
+        <!-- PWA & Mobile Web App Meta -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ausgabenrechner">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <meta name="theme-color" content="#ff8c00">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,7 +31,7 @@
         <aside id="appSidebar" class="app-sidebar" data-html2pdf-ignore aria-label="Seitenmenü">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
-                    <span class="sidebar-logo">💶</span>
+                    <span class="sidebar-logo"><svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-4a4 4 0 0 0-4 4v0a4 4 0 0 0 4 4h4"/><path d="M6 10h6"/><path d="M6 14h6"/></svg></span>
                     <span class="sidebar-title">Menü</span>
                 </div>
                 <button id="closeSidebarBtn" class="sidebar-close-btn" aria-label="Menü schließen">&times;</button>
@@ -41,17 +50,17 @@
                     <!-- Angemeldet -->
                     <div id="authStateLoggedIn" class="sidebar-card" style="display: none;">
                         <div class="sidebar-user-header">
-                            <div class="user-avatar-circle">👤</div>
+                            <div class="user-avatar-circle"><svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                             <div class="user-meta">
                                 <span class="auth-user-tag" id="authUsername">Benutzer</span>
                                 <div class="badge-row">
-                                    <span class="badge-encryption" title="Ihre Finanzdaten werden mit AES-256-GCM verschlüsselt gespeichert">🔒 AES-256</span>
+                                    <span class="badge-encryption" title="Ihre Finanzdaten werden mit AES-256-GCM verschlüsselt gespeichert"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> AES-256</span>
                                     <span id="syncStatusBadge" class="badge-sync">● Bereit</span>
                                 </div>
                             </div>
                         </div>
                         <div class="sidebar-actions">
-                            <button id="manualSyncBtn" class="btn-secondary btn-sm btn-block" title="Jetzt in der Cloud sichern">🔄 Jetzt sichern</button>
+                            <button id="manualSyncBtn" class="btn-secondary btn-sm btn-block" title="Jetzt in der Cloud sichern"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Jetzt sichern</button>
                             <button id="logoutBtn" class="btn-danger btn-sm btn-block">Abmelden</button>
                         </div>
                     </div>
@@ -59,26 +68,26 @@
                 <!-- Sektion: Szenarien (nur bei Anmeldung aktiv) -->
                 <div id="scenarioBar" class="sidebar-section" style="display: none;">
                     <div class="sidebar-section-header">
-                        <h3 class="sidebar-section-title">📂 Szenarien</h3>
-                        <button id="newScenarioBtn" class="btn-secondary btn-xs" title="Neues Szenario anlegen">➕ Neu</button>
+                        <h3 class="sidebar-section-title"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg> Szenarien</h3>
+                        <button id="newScenarioBtn" class="btn-secondary btn-xs" title="Neues Szenario anlegen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Neu</button>
                     </div>
                     <div class="sidebar-card">
                         <label for="scenarioSelect" class="sidebar-label">Aktives Szenario:</label>
                         <select id="scenarioSelect" class="scenario-select" title="Szenario auswählen"></select>
                         <div class="scenario-buttons-row">
-                            <button id="renameScenarioBtn" class="btn-secondary btn-sm" title="Aktuelles Szenario umbenennen">✏️ Umbenennen</button>
-                            <button id="deleteScenarioBtn" class="btn-danger btn-sm" title="Aktuelles Szenario löschen">🗑️ Löschen</button>
+                            <button id="renameScenarioBtn" class="btn-secondary btn-sm" title="Aktuelles Szenario umbenennen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Umbenennen</button>
+                            <button id="deleteScenarioBtn" class="btn-danger btn-sm" title="Aktuelles Szenario löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Löschen</button>
                         </div>
                     </div>
                 </div>
                 <!-- Sektion: Links -->
                 <div class="sidebar-section sidebar-bottom-links">
                     <a href="changelog.html" target="_blank" class="sidebar-link">
-                        <span>📋 Changelog</span>
-                        <span class="version-tag">v1.3.1</span>
+                        <span><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Changelog</span>
+                        <span class="version-tag">v1.4.0</span>
                     </a>
                     <a href="impressum.html" target="_blank" class="sidebar-link">
-                        <span>ℹ️ Impressum & Datenschutz</span>
+                        <span><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Impressum & Datenschutz</span>
                     </a>
                 </div>
             </div>
@@ -96,7 +105,7 @@
                     <h1>Ausgabenrechner</h1>
                 </div>
                 <button id="headerQuickAuthBtn" class="header-account-btn" aria-label="Konto & Menü" title="Konto & Menü">
-                    <span id="headerAccountIcon">👤</span>
+                    <span id="headerAccountIcon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                     <span id="headerAccountName" class="header-account-name">Anmelden</span>
                 </button>
             </div>
@@ -220,7 +229,7 @@
                 <h3>Daten & Export</h3>
                 <div class="actions">
                     <button id="exportPdfBtn" class="btn-primary" style="margin-right: 1rem;">Drucken / Als PDF speichern</button>
-                    <button id="exportBtn" class="btn-secondary">Exportieren (.xml)</button>
+                    <button id="exportBtn" class="btn-secondary"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> Exportieren (.xml)</button>
                     <label for="importInput" class="btn-secondary file-upload-label">
                         Importieren (.xml)
                         <input type="file" id="importInput" accept=".xml">
@@ -230,7 +239,7 @@
 
             <footer class="app-footer">
                 <a href="changelog.html" class="footer-link">Changelog</a>
-                <span class="footer-version">v1.3.1</span>
+                <span class="footer-version">v1.4.0</span>
                 <a href="impressum.html" class="footer-link">© 2026 Ausgabenrechner</a>
             </footer>
         </main>
@@ -288,7 +297,7 @@
                 </label>
 
                 <div class="crypto-notice">
-                    🔐 <strong>Ende-zu-Ende-Verschlüsselung (AES-256):</strong><br>
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--color-primary); margin-right: 0.3rem;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg><strong>Ende-zu-Ende-Verschlüsselung (AES-256):</strong><br>
                     Aus Ihrem Passwort wird direkt im Browser ein Verschlüsselungsschlüssel berechnet. Sämtliche Ausgaben und Einnahmen werden verschlüsselt, bevor sie in der Cloud gespeichert werden. Weder Cloudflare noch Dritte können Ihre Beträge oder Einträge lesen.
                 </div>
 

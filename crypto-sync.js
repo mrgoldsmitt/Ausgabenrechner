@@ -163,23 +163,32 @@
 
             try {
                 const exportedRaw = await crypto.subtle.exportKey('raw', key);
-                sessionStorage.setItem('ar_user', JSON.stringify(user));
-                sessionStorage.setItem('ar_key', arrayBufferToBase64(exportedRaw));
+                const rawB64 = arrayBufferToBase64(exportedRaw);
+                const userStr = JSON.stringify(user);
+
+                localStorage.setItem('ar_user', userStr);
+                localStorage.setItem('ar_key', rawB64);
                 if (this.activeScenarioId) {
-                    sessionStorage.setItem('ar_sc_id', this.activeScenarioId);
+                    localStorage.setItem('ar_sc_id', this.activeScenarioId);
                 }
                 if (this.sessionToken) {
-                    sessionStorage.setItem('ar_token', this.sessionToken);
+                    localStorage.setItem('ar_token', this.sessionToken);
                 }
+
+                // SessionStorage Sync
+                try {
+                    sessionStorage.setItem('ar_user', userStr);
+                    sessionStorage.setItem('ar_key', rawB64);
+                } catch (_) {}
             } catch (e) {
-                console.warn("Konnte Sitzung nicht in sessionStorage ablegen:", e);
+                console.warn("Konnte Sitzung nicht in localStorage ablegen:", e);
             }
         },
 
         async restoreSession() {
             try {
-                const userJson = sessionStorage.getItem('ar_user');
-                const keyB64 = sessionStorage.getItem('ar_key');
+                const userJson = localStorage.getItem('ar_user') || sessionStorage.getItem('ar_user');
+                const keyB64 = localStorage.getItem('ar_key') || sessionStorage.getItem('ar_key');
                 if (!userJson || !keyB64) return null;
 
                 const user = JSON.parse(userJson);
@@ -194,8 +203,8 @@
 
                 this.currentUser = user;
                 this.encryptionKey = key;
-                this.activeScenarioId = sessionStorage.getItem('ar_sc_id') || null;
-                this.sessionToken = sessionStorage.getItem('ar_token') || null;
+                this.activeScenarioId = localStorage.getItem('ar_sc_id') || sessionStorage.getItem('ar_sc_id') || null;
+                this.sessionToken = localStorage.getItem('ar_token') || sessionStorage.getItem('ar_token') || null;
                 return user;
             } catch (e) {
                 console.error("Fehler beim Wiederherstellen der Sitzung:", e);
@@ -210,10 +219,16 @@
             this.sessionToken = null;
             this.activeScenarioId = null;
             this.scenarios = [];
-            sessionStorage.removeItem('ar_user');
-            sessionStorage.removeItem('ar_key');
-            sessionStorage.removeItem('ar_sc_id');
-            sessionStorage.removeItem('ar_token');
+            localStorage.removeItem('ar_user');
+            localStorage.removeItem('ar_key');
+            localStorage.removeItem('ar_sc_id');
+            localStorage.removeItem('ar_token');
+            try {
+                sessionStorage.removeItem('ar_user');
+                sessionStorage.removeItem('ar_key');
+                sessionStorage.removeItem('ar_sc_id');
+                sessionStorage.removeItem('ar_token');
+            } catch (_) {}
         },
 
         // --- VaultKey Generierung & Wrapping für Zero-Data-Loss Passwort-Reset ---
@@ -420,7 +435,7 @@
             this.scenarios = data.scenarios || [];
             if (data.active_scenario_id) {
                 this.activeScenarioId = data.active_scenario_id;
-                sessionStorage.setItem('ar_sc_id', this.activeScenarioId);
+                localStorage.setItem('ar_sc_id', this.activeScenarioId);
             }
             this.notifyScenariosChange();
             return this.scenarios;
@@ -434,7 +449,7 @@
 
             const sc = await res.json();
             this.activeScenarioId = sc.id;
-            sessionStorage.setItem('ar_sc_id', sc.id);
+            localStorage.setItem('ar_sc_id', sc.id);
 
             let xmlString = "";
             if (sc.encrypted_payload && sc.iv) {
@@ -467,7 +482,7 @@
 
             const sc = await scRes.json();
             this.activeScenarioId = sc.id;
-            sessionStorage.setItem('ar_sc_id', sc.id);
+            localStorage.setItem('ar_sc_id', sc.id);
 
             let xmlString = "";
             if (sc.encrypted_payload && sc.iv) {
@@ -503,7 +518,7 @@
 
             const data = await res.json();
             this.activeScenarioId = data.active_scenario_id;
-            sessionStorage.setItem('ar_sc_id', this.activeScenarioId);
+            localStorage.setItem('ar_sc_id', this.activeScenarioId);
             await this.loadScenarios();
             return data.scenario;
         },
@@ -536,7 +551,7 @@
 
             const data = await res.json();
             this.activeScenarioId = data.active_scenario_id;
-            sessionStorage.setItem('ar_sc_id', this.activeScenarioId);
+            localStorage.setItem('ar_sc_id', this.activeScenarioId);
             await this.loadScenarios();
             return data;
         },
