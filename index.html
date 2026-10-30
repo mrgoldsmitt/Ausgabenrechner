@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ausgabenrechner</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container" id="exportContainer">
+        <!-- Cloudflare D1 Auth & Sync Bar -->
+        <div class="auth-bar" data-html2pdf-ignore>
+            <div class="auth-info">
+                <span id="authStateLoggedOut" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--color-text-muted); font-size: 0.9rem;">
+                    <span>☁️ Cloudflare D1:</span>
+                    <span>Nicht angemeldet (lokaler Speicher)</span>
+                </span>
+                <span id="authStateLoggedIn" style="display: none; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <span class="auth-user-tag">👤 <span id="authUsername"></span></span>
+                    <span class="badge-encryption" title="Ihre Finanzdaten werden mit AES-256-GCM verschlüsselt in Cloudflare D1 gespeichert">🔒 AES-256 verschlüsselt</span>
+                    <span id="syncStatusBadge" class="badge-sync">● Bereit</span>
+                </span>
+            </div>
+            <div class="auth-actions">
+                <button id="openAuthModalBtn" class="btn-primary btn-sm">Anmelden / Registrieren</button>
+                <button id="manualSyncBtn" class="btn-secondary btn-sm" style="display: none;" title="Jetzt in Cloudflare D1 sichern">🔄 Jetzt sichern</button>
+                <button id="logoutBtn" class="btn-danger btn-sm" style="display: none;">Abmelden</button>
+            </div>
+        </div>
+
+        <!-- Scenario Switcher Bar (nur im angemeldeten Zustand aktiv) -->
+        <div id="scenarioBar" class="scenario-bar" style="display: none;" data-html2pdf-ignore>
+            <div class="scenario-select-group">
+                <label for="scenarioSelect" class="scenario-label">
+                    <span>📂 Szenario:</span>
+                </label>
+                <select id="scenarioSelect" class="scenario-select" title="Szenario auswählen"></select>
+            </div>
+            <div class="scenario-actions">
+                <button id="newScenarioBtn" class="btn-secondary btn-sm" title="Neues Szenario anlegen">➕ Neu</button>
+                <button id="renameScenarioBtn" class="btn-secondary btn-sm" title="Aktuelles Szenario umbenennen">✏️ Umbenennen</button>
+                <button id="deleteScenarioBtn" class="btn-danger btn-sm" title="Aktuelles Szenario löschen">🗑️ Löschen</button>
+            </div>
+        </div>
+
+        <header>
+            <h1>Ausgabenrechner</h1>
+            <input type="text" id="subtitleInput" class="header-subtitle" placeholder="Untertitel eingeben (z.B. Mai 2026)">
+            <p id="currentDate" class="header-date"></p>
+        </header>
+
+        <main>
+            <!-- Netto & Übersicht -->
+            <!-- Netto & Übersicht -->
+            <section class="card summary-card header-dashboard">
+                <div class="dashboard-values">
+                    <div class="effective-net-display net-result">
+                        <h2>Effektives Netto</h2>
+                        <div id="effectiveNetValue" class="value">0.00 €</div>
+                    </div>
+                    <div class="effective-net-display">
+                        <h2>Gesamteinnahmen</h2>
+                        <div id="totalIncomeValue" class="value income-value">0.00 €</div>
+                    </div>
+                    <div class="effective-net-display">
+                        <h2>Gesamtausgaben</h2>
+                        <div id="totalExpensesValue" class="value expense-value">0.00 €</div>
+                    </div>
+                </div>
+                <div class="dashboard-chart">
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid-container">
+                <!-- Daten & Visualisierung -->
+                <div class="column chart-column">
+                    <!-- Diagramm -->
+                    <section class="card chart-card">
+                        <h3>Ausgabenverteilung</h3>
+                        <div class="chart-container">
+                            <canvas id="expensesChart"></canvas>
+                        </div>
+                        <div id="chartBreakdown" class="chart-breakdown"></div>
+                    </section>
+                </div>
+
+                <!-- Verwaltung & Eingabe -->
+                <div class="column form-column">
+                    <!-- Einnahmenerfassung -->
+                    <section class="card">
+                        <h3>Einnahme erfassen</h3>
+                        <form id="incomeForm" class="form-group-vertical">
+                            <input type="text" id="incomeName" placeholder="Beschreibung (z.B. Gehalt)" required>
+                            <input type="number" id="incomeAmount" placeholder="Betrag (€)" step="0.01" min="0.01" required>
+                            <button type="submit" class="btn-primary" style="background-color: var(--color-secondary);">Einnahme speichern</button>
+                        </form>
+                    </section>
+
+                    <!-- Kategorienverwaltung -->
+                    <section class="card">
+                        <h3>Kategorien</h3>
+                        <form id="categoryForm" class="form-group">
+                            <input type="text" id="newCategoryName" placeholder="Neue Kategorie (z.B. Miete)" required>
+                            <button type="submit" class="btn-primary">Hinzufügen</button>
+                        </form>
+                        <div id="categoryListContainer" class="tag-list"></div>
+                    </section>
+
+                    <!-- Ausgabenerfassung -->
+                    <section class="card">
+                        <h3>Ausgabe erfassen</h3>
+                        <form id="expenseForm" class="form-group-vertical">
+                            <input type="text" id="expenseName" placeholder="Beschreibung (z.B. Strom)" required>
+                            <div class="row">
+                                <input type="number" id="expenseAmount" placeholder="Betrag (€)" step="0.01" min="0.01" required>
+                                <select id="expenseCategory" required>
+                                    <option value="" disabled selected>Kategorie wählen</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Ausgabe speichern</button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Einnahmenliste -->
+            <section class="card incomes-list-section">
+                <h3>Alle Einnahmen</h3>
+                <ul id="incomesList" class="expense-list">
+                    <!-- Incomes will be injected here -->
+                </ul>
+                <div id="emptyIncomesMsg" class="empty-msg">Noch keine Einnahmen erfasst.</div>
+            </section>
+
+            <!-- Ausgabenliste -->
+            <section class="card expenses-list-section">
+                <h3>Alle Ausgaben</h3>
+                <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap;">
+                    <input type="text" id="expenseSearch" placeholder="Ausgaben durchsuchen..." style="flex: 2; margin-bottom: 0; min-width: 200px;">
+                    <select id="expenseSort" style="flex: 1; margin-bottom: 0; min-width: 200px;">
+                        <optgroup label="Gruppiert nach Kategorie">
+                            <option value="group-category" selected>Kategorien (Standard)</option>
+                            <option value="group-amount-desc">Kategorien + Höchste Beträge zuerst</option>
+                            <option value="group-name-asc">Kategorien + Alphabetisch (A-Z)</option>
+                        </optgroup>
+                        <optgroup label="Alle Ausgaben">
+                            <option value="flat-amount-desc">Höchste Beträge zuerst</option>
+                            <option value="flat-amount-asc">Niedrigste Beträge zuerst</option>
+                            <option value="flat-name-asc">Alphabetisch (A-Z)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <ul id="expensesList" class="expense-list">
+                    <!-- Expenses will be injected here -->
+                </ul>
+                <div id="emptyExpensesMsg" class="empty-msg">Noch keine Ausgaben erfasst.</div>
+            </section>
+
+            <!-- Daten-Management (XML) -->
+            <!-- Daten-Management (XML) -->
+            <section class="card data-management" data-html2pdf-ignore>
+                <h3>Daten & Export</h3>
+                <div class="actions">
+                    <button id="exportPdfBtn" class="btn-primary" style="margin-right: 1rem;">Drucken / Als PDF speichern</button>
+                    <button id="exportBtn" class="btn-secondary">Exportieren (.xml)</button>
+                    <label for="importInput" class="btn-secondary file-upload-label">
+                        Importieren (.xml)
+                        <input type="file" id="importInput" accept=".xml">
+                    </label>
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                <a href="changelog.html" class="footer-link">Changelog</a>
+                <span class="footer-version">v1.3.0</span>
+                <a href="impressum.html" class="footer-link">© 2026 Ausgabenrechner</a>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Authentifizierungs-Modal (Anmeldung & Registrierung) -->
+    <div id="authModal" class="modal-backdrop">
+        <div class="modal-card">
+            <button id="closeAuthModalBtn" class="modal-close-btn" title="Schließen">&times;</button>
+            
+            <div class="modal-header">
+                <h2>Cloudflare Datenbank</h2>
+                <p>Melden Sie sich an, um Ihre Finanzdaten sicher verschlüsselt in Cloudflare D1 zu speichern.</p>
+            </div>
+
+            <div class="modal-tabs" id="modalTabsHeader">
+                <button id="tabLoginBtn" class="modal-tab-btn active" type="button">Anmelden</button>
+                <button id="tabRegisterBtn" class="modal-tab-btn" type="button">Konto erstellen</button>
+            </div>
+
+            <div id="authErrorMsg" class="auth-error-msg"></div>
+            <div id="authSuccessMsg" class="auth-success-msg"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form">
+                <label>
+                    Benutzername oder E-Mail
+                    <input type="text" id="loginUsername" required autocomplete="username" placeholder="z.B. max_mustermann oder max@mail.de">
+                </label>
+                <label>
+                    Passwort
+                    <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Ihr Passwort">
+                </label>
+                <a href="#" id="forgotPasswordLink" class="auth-link">Passwort vergessen?</a>
+                <button type="submit" id="loginSubmitBtn" class="btn-primary">Anmelden & Daten laden</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form" style="display: none;">
+                <label>
+                    Benutzername
+                    <input type="text" id="regUsername" required autocomplete="username" placeholder="z.B. max_mustermann" minlength="3">
+                </label>
+                <label>
+                    E-Mail-Adresse <span style="font-weight: normal; color: var(--color-text-muted);">(optional, für Passwort-Reset)</span>
+                    <input type="email" id="regEmail" autocomplete="email" placeholder="ihre.email@beispiel.de">
+                </label>
+                <label>
+                    Passwort
+                    <input type="password" id="regPassword" required autocomplete="new-password" placeholder="Mindestens 6 Zeichen" minlength="6">
+                </label>
+                <label>
+                    Passwort wiederholen
+                    <input type="password" id="regPasswordConfirm" required autocomplete="new-password" placeholder="Passwort bestätigen">
+                </label>
+
+                <div class="crypto-notice">
+                    🔐 <strong>Ende-zu-Ende-Verschlüsselung (AES-256):</strong><br>
+                    Aus Ihrem Passwort wird direkt im Browser ein Verschlüsselungsschlüssel berechnet. Sämtliche Ausgaben und Einnahmen werden verschlüsselt, bevor sie in der Cloudflare-Datenbank landen. Weder Cloudflare noch Dritte können Ihre Beträge oder Einträge lesen.
+                </div>
+
+                <button type="submit" id="regSubmitBtn" class="btn-primary">Konto erstellen & Verschlüsselung aktivieren</button>
+            </form>
+
+            <!-- Forgot Password Step 1: Request Code -->
+            <form id="forgotPasswordForm" class="auth-form" style="display: none;">
+                <a href="#" id="backToLoginFromForgot" class="auth-back-link">← Zurück zur Anmeldung</a>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.4;">
+                    Geben Sie Ihre registrierte E-Mail-Adresse ein. Sie erhalten einen 6-stelligen Bestätigungscode, um ein neues Passwort zu vergeben.
+                </p>
+                <label>
+                    E-Mail-Adresse
+                    <input type="email" id="forgotEmail" required placeholder="ihre.email@beispiel.de">
+                </label>
+                <button type="submit" id="forgotSubmitBtn" class="btn-primary">Reset-Code anfordern</button>
+            </form>
+
+            <!-- Forgot Password Step 2: Set New Password -->
+            <form id="resetPasswordForm" class="auth-form" style="display: none;">
+                <a href="#" id="backToLoginFromReset" class="auth-back-link">← Zurück zur Anmeldung</a>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.4;">
+                    Geben Sie den erhaltenen 6-stelligen Code und Ihr neues Passwort ein.
+                </p>
+                <label>
+                    6-stelliger Reset-Code
+                    <input type="text" id="resetCode" required placeholder="z.B. 123456" maxlength="6" pattern="[0-9]{6}">
+                </label>
+                <label>
+                    Neues Passwort
+                    <input type="password" id="resetNewPassword" required placeholder="Mindestens 6 Zeichen" minlength="6">
+                </label>
+                <label>
+                    Neues Passwort bestätigen
+                    <input type="password" id="resetNewPasswordConfirm" required placeholder="Passwort wiederholen">
+                </label>
+                <button type="submit" id="resetSubmitBtn" class="btn-primary">Passwort ändern & Anmelden</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Neues Szenario anlegen -->
+    <div id="newScenarioModal" class="modal-backdrop">
+        <div class="modal-card">
+            <button id="closeNewScenarioModalBtn" class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <h2>Neues Szenario</h2>
+                <p>Erstellen Sie ein weiteres Planungsszenario (z.B. "Urlaub 2026", "Sparplan").</p>
+            </div>
+            <form id="newScenarioForm" class="auth-form">
+                <label>
+                    Name des Szenarios
+                    <input type="text" id="newScenarioName" required placeholder="z.B. Urlaub 2026" maxlength="50">
+                </label>
+                <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;">
+                    <label style="display: flex; flex-direction: row; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="scenarioSource" value="copy" checked>
+                        Aktuelle Einnahmen & Ausgaben als Kopie übernehmen
+                    </label>
+                    <label style="display: flex; flex-direction: row; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="scenarioSource" value="empty">
+                        Mit leerem Standard-Szenario beginnen
+                    </label>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button type="button" id="cancelNewScenarioBtn" class="btn-secondary" style="flex: 1;">Abbrechen</button>
+                    <button type="submit" id="submitNewScenarioBtn" class="btn-primary" style="flex: 1;">Erstellen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Szenario umbenennen -->
+    <div id="renameScenarioModal" class="modal-backdrop">
+        <div class="modal-card">
+            <button id="closeRenameScenarioModalBtn" class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <h2>Szenario umbenennen</h2>
+                <p>Geben Sie dem aktuellen Szenario einen neuen Namen.</p>
+            </div>
+            <form id="renameScenarioForm" class="auth-form">
+                <label>
+                    Neuer Name
+                    <input type="text" id="renameScenarioInput" required maxlength="50" placeholder="z.B. Hauptbudget 2026">
+                </label>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button type="button" id="cancelRenameScenarioBtn" class="btn-secondary" style="flex: 1;">Abbrechen</button>
+                    <button type="submit" id="submitRenameScenarioBtn" class="btn-primary" style="flex: 1;">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="appToast" class="app-toast"></div>
+
+    <script src="crypto-sync.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

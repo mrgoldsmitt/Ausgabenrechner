@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Cloudflare Wrangler local state & temporary databases
+.wrangler/
+.dev.vars
+*.local.sql
+
+# Environment files & secrets
+.env
+.env.*
+
+# Operating System files
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# IDE & Editor files
+.vscode/
+.idea/

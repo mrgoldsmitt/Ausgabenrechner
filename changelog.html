@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog – Ausgabenrechner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #ffffff;
+            --color-surface: #fff7f0;
+            --color-primary: #ff8c00;
+            --color-border: #ffd1a3;
+            --color-text-main: #4a2500;
+            --color-text-muted: #8c5926;
+            --color-secondary: #ffb347;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #e07b00;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .version-block {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-left: 5px solid var(--color-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .version-tag {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-text-main);
+        }
+
+        .version-date {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .change-category {
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .cat-new {
+            background-color: #e6f9e6;
+            color: #1a7a1a;
+        }
+
+        .cat-improved {
+            background-color: #fff3e0;
+            color: #cc7700;
+        }
+
+        .cat-fixed {
+            background-color: #fce4ec;
+            color: #c62828;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 0.3rem 0 0.3rem 1.2rem;
+            position: relative;
+            font-size: 0.95rem;
+        }
+
+        ul li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--color-secondary);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Zurück zum Ausgabenrechner</a>
+        <h1>Changelog</h1>
+        <p class="subtitle">Alle Änderungen am Ausgabenrechner im Überblick.</p>
+
+        <div class="version-block">
+            <div class="version-header">
+                <span class="version-tag">Version 1.3.0</span>
+                <span class="version-date">30. Oktober 2026</span>
+            </div>
+
+            <span class="change-category cat-new">Neu</span>
+            <ul>
+                <li><strong>Szenarien-Verwaltung:</strong> Sie können nun beliebig viele unterschiedliche Szenarien (z.B. "Standard-Monat", "Urlaub 2026", "Sparplan") anlegen, nach Belieben benennen und direkt in der App umschalten.</li>
+                <li><strong>Szenarien verwalten:</strong> Vorhandene Szenarien können jederzeit umbenannt, als Vorlage für neue Szenarien kopiert oder gelöscht werden.</li>
+                <li><strong>E-Mail-Hinterlegung & Passwort-Reset:</strong> Bei der Registrierung kann nun eine E-Mail-Adresse hinterlegt werden, über die per 6-stelligem Bestätigungscode ein vergessenes Passwort sicher zurückgesetzt werden kann.</li>
+                <li><strong>Zero-Data-Loss Key Wrapping:</strong> Trotz Zero-Knowledge-Verschlüsselung bleiben alle Szenarien und Daten nach einem Passwort-Reset vollständig lesbar und erhalten.</li>
+            </ul>
+
+            <span class="change-category cat-improved">Verbessert</span>
+            <ul>
+                <li>Nahtloses Umschalten zwischen Szenarien mit automatischer Vorab-Sicherung des aktuellen Stands.</li>
+                <li>Export als PDF und XML berücksichtigt das aktuell ausgewählte Szenario.</li>
+            </ul>
+        </div>
+
+        <div class="version-block">
+            <div class="version-header">
+                <span class="version-tag">Version 1.2.0</span>
+                <span class="version-date">30. Oktober 2026</span>
+            </div>
+
+            <span class="change-category cat-new">Neu</span>
+            <ul>
+                <li><strong>Cloudflare D1-Datenbankanbindung:</strong> Echtes Datenbank-Backend auf Edge-Infrastruktur für nahtlose geräteübergreifende Speicherung.</li>
+                <li><strong>Zero-Knowledge Ende-zu-Ende-Verschlüsselung:</strong> Alle Finanzdaten (Ausgaben, Einnahmen, Kategorien) werden direkt im Browser mit AES-256-GCM verschlüsselt. Weder Cloudflare noch Dritte haben Zugriff auf Beträge oder Bezeichnungen.</li>
+                <li><strong>Benutzeranmeldung & Registrierung:</strong> Sicheres Login mit PBKDF2 (SHA-256, 100.000 Iterationen) und Server-Salt. Klartext-Passwörter verlassen niemals den Browser.</li>
+                <li><strong>Automatischer Hintergrund-Sync:</strong> Änderungen werden automatisch verschlüsselt in die Cloud übertragen.</li>
+            </ul>
+
+            <span class="change-category cat-improved">Verbessert</span>
+            <ul>
+                <li>Bestehende Logik für Berechnungen, Diagramme, XML-Export/Import und PDF-Export bleibt vollständig erhalten und funktioniert im verschlüsselten Modus unverändert.</li>
+            </ul>
+        </div>
+
+        <div class="version-block">
+            <div class="version-header">
+                <span class="version-tag">Version 1.1.2</span>
+                <span class="version-date">1. Juni 2026</span>
+            </div>
+
+            <span class="change-category cat-fixed">Behoben</span>
+            <ul>
+                <li>Fehlerhafter XML-Import durch doppelte XML-Deklarationen beim Export behoben. Ältere fehlerhafte XML-Dateien werden beim Import nun automatisch repariert.</li>
+            </ul>
+            
+            <span class="change-category cat-new">Neu</span>
+            <ul>
+                <li>Volltextsuche in der Liste der Ausgaben hinzugefügt. Filtert in Echtzeit nach Name, Kategorie oder exaktem Betrag.</li>
+                <li>Umfangreiche Sortierfunktion (Kategorien, Beträge und Alphabet) als gruppierte oder flache Liste.</li>
+                <li>Ausgabenliste wird im Standardmodus übersichtlich nach Kategorien gruppiert.</li>
+                <li>In der gruppierten Ansicht wird die Summe der Ausgaben direkt in der Kategorienüberschrift angezeigt.</li>
+                <li>Impressum und Haftungsausschluss (Disclaimer) hinzugefügt (verlinkt im Footer unter dem Copyright).</li>
+            </ul>
+        </div>
+
+        <div class="version-block">
+            <div class="version-header">
+                <span class="version-tag">Version 1.1.1</span>
+                <span class="version-date">30. Mai 2026</span>
+            </div>
+
+            <span class="change-category cat-new">Neu</span>
+            <ul>
+                <li>PDF-Export über die native Druckfunktion des Browsers – der Dokumenttitel wird automatisch als Dateiname vorgeschlagen (Format: <code>Ausgabenrechner_Untertitel_Datum_Uhrzeit</code>)</li>
+                <li>Druckansicht (<code>@media print</code>) blendet Formular-Kacheln, Daten-&amp;-Export-Bereich und Footer aus und erzwingt ein einspaltiges Layout</li>
+                <li>Bearbeitungs-Buttons (Löschen/Bearbeiten) werden in der Druckansicht automatisch ausgeblendet</li>
+            </ul>
+
+            <span class="change-category cat-improved">Verbessert</span>
+            <ul>
+                <li>Footer wird auf Smartphones jetzt immer am unteren Bildschirmrand angezeigt (via <code>min-height: 100dvh</code> und Flexbox-Layout)</li>
+                <li>Versionsnummer im Footer auf v1.1.1 aktualisiert</li>
+                <li>Copyright-Angabe angepasst: © 2026 Ausgabenrechner</li>
+            </ul>
+        </div>
+
+        <div class="version-block">
+            <div class="version-header">
+                <span class="version-tag">Version 1.1.0</span>
+                <span class="version-date">30. Mai 2026</span>
+            </div>
+
+            <span class="change-category cat-new">Neu</span>
+            <ul>
+                <li>Lokale Datenspeicherung via LocalStorage – alle Einnahmen, Ausgaben und Kategorien bleiben auch nach dem Schließen des Browsers erhalten</li>
+                <li>Editierbarer Untertitel unter dem Titel „Ausgabenrechner" – wird im XML gespeichert, exportiert, importiert und im PDF angezeigt</li>
+                <li>Fußzeile mit Versionsnummer, Copyright und Link zum Changelog</li>
+            </ul>
+
+            <span class="change-category cat-improved">Verbessert</span>
+            <ul>
+                <li>PDF-Export komplett überarbeitet: nutzt jetzt die offizielle <code>onclone</code>-API von html2canvas für zuverlässiges Rendering</li>
+                <li>PDF zeigt nur relevante Kacheln (Dashboard, Diagramm, Einnahmen- &amp; Ausgabenliste) in einem einspaltigen Layout</li>
+                <li>Formular-Kacheln (Einnahme/Ausgabe erfassen, Kategorien) und der Daten-&amp;-Export-Bereich werden im PDF ausgeblendet</li>
+                <li>Chart.js-Diagramme werden im PDF als statische Bilder eingebettet für garantierte Darstellung</li>
+            </ul>
+
+            <span class="change-category cat-fixed">Behoben</span>
+            <ul>
+                <li>Weiße/leere Seiten im PDF-Export behoben (Ursache: <code>display: contents</code> wurde von html2canvas nicht unterstützt)</li>
+                <li>Standard-Kategorien werden nur noch beim allerersten Start angelegt, nicht mehr bei jedem Seitenaufruf</li>
+            </ul>
+        </div>
+
+        <div class="version-block">
+            <div class="version-header">
+                <span class="version-tag">Version 1.0.1</span>
+                <span class="version-date">30. Mai 2026</span>
+            </div>
+
+            <span class="change-category cat-new">Neu</span>
+            <ul>
+                <li>Erste öffentliche Version des Ausgabenrechners</li>
+                <li>Einnahmen- und Ausgabenerfassung mit Kategorien</li>
+                <li>Ausgabenverteilung als Tortendiagramm mit statischer Legende</li>
+                <li>Einnahmen-/Ausgaben-Vergleich als Balkendiagramm</li>
+                <li>PDF-Export der Übersicht</li>
+                <li>XML-Daten-Export und -Import</li>
+                <li>Mobile-First-Design optimiert für kleine Bildschirme</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

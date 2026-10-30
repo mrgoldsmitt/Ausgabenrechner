@@ -1,0 +1,14 @@
+{
+  "name": "ausgabenrechner",
+  "version": "1.3.0",
+  "description": "Ausgabenrechner mit Cloudflare D1 und Ende-zu-Ende-Verschlüsselung",
+  "scripts": {
+    "dev": "wrangler pages dev . --d1 DB=ausgabenrechner-db",
+    "db:init:local": "wrangler d1 execute ausgabenrechner-db --local --file=./schema.sql",
+    "db:init:remote": "wrangler d1 execute ausgabenrechner-db --remote --file=./schema.sql",
+    "deploy": "wrangler pages deploy ."
+  },
+  "devDependencies": {
+    "wrangler": "^4.156.0"
+  }
+}
