@@ -6,7 +6,9 @@
     "dev": "wrangler pages dev . --d1 DB=ausgabenrechner-db",
     "db:init:local": "wrangler d1 execute ausgabenrechner-db --local --file=./schema.sql",
     "db:init:remote": "wrangler d1 execute ausgabenrechner-db --remote --file=./schema.sql",
-    "deploy": "wrangler pages deploy ."
+    "deploy:pages": "wrangler pages deploy . --project-name ausgabenrechner",
+    "deploy:worker": "wrangler deploy -c wrangler.worker.toml",
+    "deploy": "npm run deploy:pages && npm run deploy:worker"
   },
   "devDependencies": {
     "wrangler": "^4.156.0"
