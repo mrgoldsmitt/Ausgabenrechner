@@ -795,7 +795,7 @@ window.addEventListener('load', () => {
     }
 });
 
-// --- Authentifizierung & Cloudflare D1 Sync Controller ---
+// --- Authentifizierung & der Cloud Sync Controller ---
 
 const authDom = {
     authModal: document.getElementById('authModal'),
@@ -845,6 +845,15 @@ const authDom = {
     logoutBtn: document.getElementById('logoutBtn'),
     toast: document.getElementById('appToast'),
 
+    // Sidebar & Header Burger
+    openSidebarBtn: document.getElementById('openSidebarBtn'),
+    closeSidebarBtn: document.getElementById('closeSidebarBtn'),
+    sidebarBackdrop: document.getElementById('sidebarBackdrop'),
+    appSidebar: document.getElementById('appSidebar'),
+    headerQuickAuthBtn: document.getElementById('headerQuickAuthBtn'),
+    headerAccountName: document.getElementById('headerAccountName'),
+    burgerStatusDot: document.getElementById('burgerStatusDot'),
+
     // Scenario Bar & Modals
     scenarioBar: document.getElementById('scenarioBar'),
     scenarioSelect: document.getElementById('scenarioSelect'),
@@ -877,23 +886,71 @@ function showToast(message, duration = 3000) {
     }, duration);
 }
 
+// Sidebar Controller
+function openSidebar() {
+    if (authDom.appSidebar) authDom.appSidebar.classList.add('open');
+    if (authDom.sidebarBackdrop) authDom.sidebarBackdrop.classList.add('active');
+}
+
+function closeSidebar() {
+    if (authDom.appSidebar) authDom.appSidebar.classList.remove('open');
+    if (authDom.sidebarBackdrop) authDom.sidebarBackdrop.classList.remove('active');
+}
+
+// Event Listeners for Sidebar
+if (authDom.openSidebarBtn) {
+    authDom.openSidebarBtn.addEventListener('click', openSidebar);
+}
+if (authDom.headerQuickAuthBtn) {
+    authDom.headerQuickAuthBtn.addEventListener('click', openSidebar);
+}
+if (authDom.closeSidebarBtn) {
+    authDom.closeSidebarBtn.addEventListener('click', closeSidebar);
+}
+if (authDom.sidebarBackdrop) {
+    authDom.sidebarBackdrop.addEventListener('click', closeSidebar);
+}
+
+// Close sidebar / modals on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeSidebar();
+        if (authDom.authModal) authDom.authModal.classList.remove('active');
+        if (authDom.newScenarioModal) authDom.newScenarioModal.classList.remove('active');
+        if (authDom.renameScenarioModal) authDom.renameScenarioModal.classList.remove('active');
+    }
+});
+
 // Update UI based on authentication state
 function updateAuthUI(user) {
     if (user) {
         if (authDom.authStateLoggedOut) authDom.authStateLoggedOut.style.display = 'none';
-        if (authDom.authStateLoggedIn) authDom.authStateLoggedIn.style.display = 'inline-flex';
+        if (authDom.authStateLoggedIn) authDom.authStateLoggedIn.style.display = 'block';
         if (authDom.authUsername) authDom.authUsername.textContent = user.username;
         if (authDom.openAuthModalBtn) authDom.openAuthModalBtn.style.display = 'none';
-        if (authDom.manualSyncBtn) authDom.manualSyncBtn.style.display = 'inline-block';
-        if (authDom.logoutBtn) authDom.logoutBtn.style.display = 'inline-block';
-        if (authDom.scenarioBar) authDom.scenarioBar.style.display = 'flex';
+        if (authDom.manualSyncBtn) authDom.manualSyncBtn.style.display = 'block';
+        if (authDom.logoutBtn) authDom.logoutBtn.style.display = 'block';
+        if (authDom.scenarioBar) authDom.scenarioBar.style.display = 'block';
+
+        if (authDom.headerAccountName) authDom.headerAccountName.textContent = user.username;
+        if (authDom.headerQuickAuthBtn) authDom.headerQuickAuthBtn.title = 'Konto: ' + user.username;
+        if (authDom.burgerStatusDot) {
+            authDom.burgerStatusDot.style.display = 'block';
+            authDom.burgerStatusDot.style.backgroundColor = '#28a745';
+        }
     } else {
-        if (authDom.authStateLoggedOut) authDom.authStateLoggedOut.style.display = 'inline-flex';
+        if (authDom.authStateLoggedOut) authDom.authStateLoggedOut.style.display = 'block';
         if (authDom.authStateLoggedIn) authDom.authStateLoggedIn.style.display = 'none';
-        if (authDom.openAuthModalBtn) authDom.openAuthModalBtn.style.display = 'inline-block';
+        if (authDom.openAuthModalBtn) authDom.openAuthModalBtn.style.display = 'block';
         if (authDom.manualSyncBtn) authDom.manualSyncBtn.style.display = 'none';
         if (authDom.logoutBtn) authDom.logoutBtn.style.display = 'none';
         if (authDom.scenarioBar) authDom.scenarioBar.style.display = 'none';
+
+        if (authDom.headerAccountName) authDom.headerAccountName.textContent = 'Anmelden';
+        if (authDom.headerQuickAuthBtn) authDom.headerQuickAuthBtn.title = 'Konto & Menü';
+        if (authDom.burgerStatusDot) {
+            authDom.burgerStatusDot.style.display = 'none';
+        }
     }
 }
 
@@ -936,6 +993,7 @@ function resetAuthModalViews() {
 // Modal open / close
 if (authDom.openAuthModalBtn) {
     authDom.openAuthModalBtn.addEventListener('click', () => {
+        closeSidebar();
         resetAuthModalViews();
         authDom.authModal.classList.add('active');
         authDom.loginUsername.focus();
@@ -1185,7 +1243,7 @@ if (authDom.manualSyncBtn) {
         const currentXml = serializer.serializeToString(stateDoc);
         const success = await window.CryptoSync.saveCloudData(currentXml);
         if (success) {
-            showToast("Daten erfolgreich verschlüsselt in Cloudflare D1 gesichert.");
+            showToast("Daten erfolgreich verschlüsselt in der Cloud gesichert.");
         } else {
             showToast("Fehler beim Synchronisieren.");
         }
@@ -1268,6 +1326,7 @@ if (authDom.scenarioSelect) {
 // Neues Szenario Modal
 if (authDom.newScenarioBtn) {
     authDom.newScenarioBtn.addEventListener('click', () => {
+        closeSidebar();
         authDom.newScenarioName.value = '';
         authDom.newScenarioModal.classList.add('active');
         authDom.newScenarioName.focus();
@@ -1330,6 +1389,7 @@ if (authDom.newScenarioForm) {
 // Szenario Umbenennen Modal
 if (authDom.renameScenarioBtn) {
     authDom.renameScenarioBtn.addEventListener('click', () => {
+        closeSidebar();
         const currentSc = window.CryptoSync.scenarios.find(s => s.id === window.CryptoSync.activeScenarioId);
         authDom.renameScenarioInput.value = currentSc ? currentSc.name : '';
         authDom.renameScenarioModal.classList.add('active');
@@ -1403,13 +1463,29 @@ if (window.CryptoSync) {
 
         if (status === 'saving') {
             authDom.syncStatusBadge.innerHTML = '🔄 Wird verschlüsselt & gespeichert...';
+            if (authDom.burgerStatusDot) {
+                authDom.burgerStatusDot.style.display = 'block';
+                authDom.burgerStatusDot.style.backgroundColor = '#ff9900';
+            }
         } else if (status === 'pending') {
             authDom.syncStatusBadge.innerHTML = '⏳ Synchronisation ausstehend...';
+            if (authDom.burgerStatusDot) {
+                authDom.burgerStatusDot.style.display = 'block';
+                authDom.burgerStatusDot.style.backgroundColor = '#ffaa00';
+            }
         } else if (status === 'synced') {
             const timeStr = lastSync ? lastSync.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
             authDom.syncStatusBadge.innerHTML = `● Gespeichert (${timeStr} Uhr)`;
+            if (authDom.burgerStatusDot) {
+                authDom.burgerStatusDot.style.display = 'block';
+                authDom.burgerStatusDot.style.backgroundColor = '#28a745';
+            }
         } else if (status === 'error') {
             authDom.syncStatusBadge.innerHTML = `⚠️ Sync-Fehler (${message || 'Offline'})`;
+            if (authDom.burgerStatusDot) {
+                authDom.burgerStatusDot.style.display = 'block';
+                authDom.burgerStatusDot.style.backgroundColor = '#ff4d4d';
+            }
         }
     });
 }

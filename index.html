@@ -17,43 +17,89 @@
 </head>
 <body>
     <div class="app-container" id="exportContainer">
-        <!-- Cloudflare D1 Auth & Sync Bar -->
-        <div class="auth-bar" data-html2pdf-ignore>
-            <div class="auth-info">
-                <span id="authStateLoggedOut" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--color-text-muted); font-size: 0.9rem;">
-                    <span>☁️ Cloudflare D1:</span>
-                    <span>Nicht angemeldet (lokaler Speicher)</span>
-                </span>
-                <span id="authStateLoggedIn" style="display: none; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                    <span class="auth-user-tag">👤 <span id="authUsername"></span></span>
-                    <span class="badge-encryption" title="Ihre Finanzdaten werden mit AES-256-GCM verschlüsselt in Cloudflare D1 gespeichert">🔒 AES-256 verschlüsselt</span>
-                    <span id="syncStatusBadge" class="badge-sync">● Bereit</span>
-                </span>
+        <!-- Left Navigation Sidebar Drawer -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop" data-html2pdf-ignore></div>
+        <aside id="appSidebar" class="app-sidebar" data-html2pdf-ignore aria-label="Seitenmenü">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span class="sidebar-logo">💶</span>
+                    <span class="sidebar-title">Menü</span>
+                </div>
+                <button id="closeSidebarBtn" class="sidebar-close-btn" aria-label="Menü schließen">&times;</button>
             </div>
-            <div class="auth-actions">
-                <button id="openAuthModalBtn" class="btn-primary btn-sm">Anmelden / Registrieren</button>
-                <button id="manualSyncBtn" class="btn-secondary btn-sm" style="display: none;" title="Jetzt in Cloudflare D1 sichern">🔄 Jetzt sichern</button>
-                <button id="logoutBtn" class="btn-danger btn-sm" style="display: none;">Abmelden</button>
+            <div class="sidebar-body">
+                <!-- Sektion: Benutzerkonto -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-section-title">Konto & Synchronisation</h3>
+                    <!-- Abgemeldet -->
+                    <div id="authStateLoggedOut" class="sidebar-card">
+                        <div class="sidebar-status-desc">
+                            <span>Lokal im Browser gespeichert (nicht angemeldet).</span>
+                        </div>
+                        <button id="openAuthModalBtn" class="btn-primary btn-block">Anmelden / Registrieren</button>
+                    </div>
+                    <!-- Angemeldet -->
+                    <div id="authStateLoggedIn" class="sidebar-card" style="display: none;">
+                        <div class="sidebar-user-header">
+                            <div class="user-avatar-circle">👤</div>
+                            <div class="user-meta">
+                                <span class="auth-user-tag" id="authUsername">Benutzer</span>
+                                <div class="badge-row">
+                                    <span class="badge-encryption" title="Ihre Finanzdaten werden mit AES-256-GCM verschlüsselt gespeichert">🔒 AES-256</span>
+                                    <span id="syncStatusBadge" class="badge-sync">● Bereit</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sidebar-actions">
+                            <button id="manualSyncBtn" class="btn-secondary btn-sm btn-block" title="Jetzt in der Cloud sichern">🔄 Jetzt sichern</button>
+                            <button id="logoutBtn" class="btn-danger btn-sm btn-block">Abmelden</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sektion: Szenarien (nur bei Anmeldung aktiv) -->
+                <div id="scenarioBar" class="sidebar-section" style="display: none;">
+                    <div class="sidebar-section-header">
+                        <h3 class="sidebar-section-title">📂 Szenarien</h3>
+                        <button id="newScenarioBtn" class="btn-secondary btn-xs" title="Neues Szenario anlegen">➕ Neu</button>
+                    </div>
+                    <div class="sidebar-card">
+                        <label for="scenarioSelect" class="sidebar-label">Aktives Szenario:</label>
+                        <select id="scenarioSelect" class="scenario-select" title="Szenario auswählen"></select>
+                        <div class="scenario-buttons-row">
+                            <button id="renameScenarioBtn" class="btn-secondary btn-sm" title="Aktuelles Szenario umbenennen">✏️ Umbenennen</button>
+                            <button id="deleteScenarioBtn" class="btn-danger btn-sm" title="Aktuelles Szenario löschen">🗑️ Löschen</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sektion: Links -->
+                <div class="sidebar-section sidebar-bottom-links">
+                    <a href="changelog.html" target="_blank" class="sidebar-link">
+                        <span>📋 Changelog</span>
+                        <span class="version-tag">v1.3.1</span>
+                    </a>
+                    <a href="impressum.html" target="_blank" class="sidebar-link">
+                        <span>ℹ️ Impressum & Datenschutz</span>
+                    </a>
+                </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- Scenario Switcher Bar (nur im angemeldeten Zustand aktiv) -->
-        <div id="scenarioBar" class="scenario-bar" style="display: none;" data-html2pdf-ignore>
-            <div class="scenario-select-group">
-                <label for="scenarioSelect" class="scenario-label">
-                    <span>📂 Szenario:</span>
-                </label>
-                <select id="scenarioSelect" class="scenario-select" title="Szenario auswählen"></select>
+        <header class="app-header">
+            <div class="header-top-bar" data-html2pdf-ignore>
+                <button id="openSidebarBtn" class="burger-menu-btn" aria-label="Menü öffnen" title="Menü öffnen (Anmeldung & Szenarien)">
+                    <span class="burger-bar"></span>
+                    <span class="burger-bar"></span>
+                    <span class="burger-bar"></span>
+                    <span id="burgerStatusDot" class="burger-status-dot" style="display: none;"></span>
+                </button>
+                <div class="header-titles">
+                    <h1>Ausgabenrechner</h1>
+                </div>
+                <button id="headerQuickAuthBtn" class="header-account-btn" aria-label="Konto & Menü" title="Konto & Menü">
+                    <span id="headerAccountIcon">👤</span>
+                    <span id="headerAccountName" class="header-account-name">Anmelden</span>
+                </button>
             </div>
-            <div class="scenario-actions">
-                <button id="newScenarioBtn" class="btn-secondary btn-sm" title="Neues Szenario anlegen">➕ Neu</button>
-                <button id="renameScenarioBtn" class="btn-secondary btn-sm" title="Aktuelles Szenario umbenennen">✏️ Umbenennen</button>
-                <button id="deleteScenarioBtn" class="btn-danger btn-sm" title="Aktuelles Szenario löschen">🗑️ Löschen</button>
-            </div>
-        </div>
-
-        <header>
-            <h1>Ausgabenrechner</h1>
             <input type="text" id="subtitleInput" class="header-subtitle" placeholder="Untertitel eingeben (z.B. Mai 2026)">
             <p id="currentDate" class="header-date"></p>
         </header>
@@ -184,7 +230,7 @@
 
             <footer class="app-footer">
                 <a href="changelog.html" class="footer-link">Changelog</a>
-                <span class="footer-version">v1.3.0</span>
+                <span class="footer-version">v1.3.1</span>
                 <a href="impressum.html" class="footer-link">© 2026 Ausgabenrechner</a>
             </footer>
         </main>
@@ -196,8 +242,8 @@
             <button id="closeAuthModalBtn" class="modal-close-btn" title="Schließen">&times;</button>
             
             <div class="modal-header">
-                <h2>Cloudflare Datenbank</h2>
-                <p>Melden Sie sich an, um Ihre Finanzdaten sicher verschlüsselt in Cloudflare D1 zu speichern.</p>
+                <h2>Konto & Synchronisation</h2>
+                <p>Melden Sie sich an, um Ihre Finanzdaten sicher und verschlüsselt zu speichern.</p>
             </div>
 
             <div class="modal-tabs" id="modalTabsHeader">
@@ -243,7 +289,7 @@
 
                 <div class="crypto-notice">
                     🔐 <strong>Ende-zu-Ende-Verschlüsselung (AES-256):</strong><br>
-                    Aus Ihrem Passwort wird direkt im Browser ein Verschlüsselungsschlüssel berechnet. Sämtliche Ausgaben und Einnahmen werden verschlüsselt, bevor sie in der Cloudflare-Datenbank landen. Weder Cloudflare noch Dritte können Ihre Beträge oder Einträge lesen.
+                    Aus Ihrem Passwort wird direkt im Browser ein Verschlüsselungsschlüssel berechnet. Sämtliche Ausgaben und Einnahmen werden verschlüsselt, bevor sie in der Cloud gespeichert werden. Weder Cloudflare noch Dritte können Ihre Beträge oder Einträge lesen.
                 </div>
 
                 <button type="submit" id="regSubmitBtn" class="btn-primary">Konto erstellen & Verschlüsselung aktivieren</button>
