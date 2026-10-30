@@ -431,6 +431,7 @@ function render() {
 
 function renderComparisonChart(totalIncome, totalExpenses) {
     if (!dom.comparisonChartCanvas) return;
+    if (typeof Chart === 'undefined') return;
     
     if (comparisonChartInstance) {
         comparisonChartInstance.data.datasets[0].data = [totalIncome, totalExpenses];
@@ -515,6 +516,7 @@ function renderChart(expenses, categories, totalExpenses) {
     }
 
     // Re-use or initialize chart
+    if (typeof Chart === 'undefined') return;
     if (expensesChartInstance) {
         expensesChartInstance.data.labels = labels;
         expensesChartInstance.data.datasets[0].data = data;
@@ -785,6 +787,13 @@ if (isFirstLoad) {
 
 // Initial Render
 render();
+
+// Falls Chart.js asynchron verzögert lädt (z. B. auf mobilen Browsern wie Safari)
+window.addEventListener('load', () => {
+    if (typeof Chart !== 'undefined' && (!expensesChartInstance || !comparisonChartInstance)) {
+        render();
+    }
+});
 
 // --- Authentifizierung & Cloudflare D1 Sync Controller ---
 
