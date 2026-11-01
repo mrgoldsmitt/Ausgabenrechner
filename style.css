@@ -397,6 +397,225 @@ button:active, .file-upload-label:active {
     margin-left: auto;
 }
 
+/* Inline-Änderungsfenster unmittelbar unter dem Eintrag */
+.expense-item {
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.expense-item.is-editing {
+    border-color: var(--color-primary);
+    background-color: #fffaf0;
+    box-shadow: 0 4px 16px rgba(255, 140, 0, 0.12);
+}
+
+.expense-actions .income-edit.active,
+.expense-actions .expense-edit.active {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.expense-amount[title] {
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s;
+    border-radius: 4px;
+    padding: 0.1rem 0.3rem;
+}
+
+.expense-amount[title]:hover {
+    color: var(--color-primary-hover);
+    background-color: rgba(255, 140, 0, 0.08);
+}
+
+.inline-edit-popover {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 1rem 1.1rem;
+    background-color: #ffffff;
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 24px rgba(255, 140, 0, 0.16);
+    position: relative;
+    animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+/* Pfeil zum bearbeiteten Eintrag */
+.inline-edit-popover::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 56px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--color-primary);
+}
+
+.inline-edit-popover::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 57px;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #ffffff;
+}
+
+@keyframes popoverFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inline-edit-popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.inline-edit-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: rgba(255, 140, 0, 0.12);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.inline-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.inline-edit-grid {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.inline-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 140px;
+}
+
+.inline-edit-field.field-name {
+    flex: 2;
+    min-width: 180px;
+}
+
+.inline-edit-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.inline-edit-input {
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.95rem !important;
+    border: 1.5px solid var(--color-border) !important;
+    border-radius: 8px !important;
+    background-color: var(--color-bg) !important;
+    color: var(--color-text-main) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.inline-edit-input:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2) !important;
+    background-color: #ffffff !important;
+    outline: none !important;
+}
+
+.inline-edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+}
+
+.inline-save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.15rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.inline-save-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.inline-save-btn:active {
+    transform: scale(0.98);
+}
+
+.inline-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: var(--color-surface);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.inline-cancel-btn:hover {
+    background-color: #ffe6cc;
+    border-color: var(--color-secondary);
+}
+
+@media (max-width: 600px) {
+    .inline-edit-grid {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .inline-edit-field,
+    .inline-edit-field.field-name {
+        width: 100%;
+        min-width: 0;
+    }
+    .inline-edit-actions {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+    }
+    .inline-save-btn,
+    .inline-cancel-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .inline-edit-popover::before,
+    .inline-edit-popover::after {
+        right: 48px;
+    }
+}
+
 .empty-msg {
     text-align: center;
     color: var(--color-text-muted);
@@ -1323,8 +1542,9 @@ button:active, .file-upload-label:active {
         display: none !important;
     }
     
-    /* Bearbeitungs-Buttons ausblenden */
-    .expense-actions button {
+    /* Bearbeitungs-Buttons und Inline-Änderungsfenster ausblenden */
+    .expense-actions button,
+    .inline-edit-popover {
         display: none !important;
     }
     

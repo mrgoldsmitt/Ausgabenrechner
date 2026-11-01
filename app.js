@@ -217,6 +217,110 @@ function removeExpenseXML(id) {
     }
 }
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function escapeAttr(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function focusEditingInput(type, id) {
+    setTimeout(() => {
+        const inputId = type === 'income' ? `editIncName_${id}` : `editExpName_${id}`;
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.focus();
+            input.select();
+            const rect = input.getBoundingClientRect();
+            if (rect.top < 80 || rect.bottom > window.innerHeight - 20) {
+                input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }, 40);
+}
+
+function renderExpenseItem(exp, categories, isGrouped) {
+    const isEditing = (editingExpenseId === exp.id);
+    const li = document.createElement('li');
+    li.className = `expense-item ${isEditing ? 'is-editing' : ''}`;
+    li.setAttribute('data-id', exp.id);
+    
+    let innerHtml = `
+        <div class="expense-info">
+            <span class="expense-name">${escapeHtml(exp.name)}</span>
+            ${!isGrouped ? `<span class="expense-meta">${escapeHtml(exp.category)}</span>` : ''}
+        </div>
+        <div class="expense-actions">
+            <span class="expense-amount" style="cursor: pointer;" title="Klicken zum Bearbeiten">${formatCurrency(exp.amount)}</span>
+            <button class="btn-secondary expense-edit ${isEditing ? 'active' : ''}" data-id="${exp.id}" title="${isEditing ? 'Bearbeiten schließen' : 'Bearbeiten'}" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+            </button>
+            <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    `;
+    
+    if (isEditing) {
+        let catOptions = '';
+        categories.forEach(cat => {
+            const isSelected = (cat === exp.category) ? 'selected' : '';
+            catOptions += `<option value="${escapeAttr(cat)}" ${isSelected}>${escapeHtml(cat)}</option>`;
+        });
+        
+        innerHtml += `
+            <div class="inline-edit-popover">
+                <div class="inline-edit-popover-header">
+                    <span class="inline-edit-badge">
+                        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        Ausgabe bearbeiten
+                    </span>
+                </div>
+                <form class="inline-edit-form" data-type="expense" data-id="${exp.id}">
+                    <div class="inline-edit-grid">
+                        <div class="inline-edit-field field-name">
+                            <label for="editExpName_${exp.id}">Beschreibung</label>
+                            <input type="text" id="editExpName_${exp.id}" class="inline-edit-input" value="${escapeAttr(exp.name)}" required autocomplete="off">
+                        </div>
+                        <div class="inline-edit-field field-amount">
+                            <label for="editExpAmount_${exp.id}">Betrag (€)</label>
+                            <input type="number" id="editExpAmount_${exp.id}" class="inline-edit-input" step="0.01" min="0.01" value="${exp.amount}" required>
+                        </div>
+                        <div class="inline-edit-field field-category">
+                            <label for="editExpCategory_${exp.id}">Kategorie</label>
+                            <select id="editExpCategory_${exp.id}" class="inline-edit-input" required>
+                                ${catOptions}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="inline-edit-actions">
+                        <button type="submit" class="btn-primary inline-save-btn">
+                            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            Speichern
+                        </button>
+                        <button type="button" class="btn-secondary inline-cancel-btn" data-id="${exp.id}">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+    
+    return li;
+}
+
 // --- Render Logic ---
 
 function render() {
@@ -276,18 +380,61 @@ function render() {
         }
 
         incomes.forEach(inc => {
+            const isEditing = (editingIncomeId === inc.id);
             const li = document.createElement('li');
-            li.className = 'expense-item';
-            li.innerHTML = `
+            li.className = `expense-item ${isEditing ? 'is-editing' : ''}`;
+            li.setAttribute('data-id', inc.id);
+            
+            let innerHtml = `
                 <div class="expense-info">
-                    <span class="expense-name">${inc.name}</span>
+                    <span class="expense-name">${escapeHtml(inc.name)}</span>
                 </div>
                 <div class="expense-actions">
-                    <span class="expense-amount" style="color: var(--color-primary);">${formatCurrency(inc.amount)}</span>
-                    <button class="btn-secondary income-edit" data-id="${inc.id}" title="Bearbeiten" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
-                    <button class="btn-danger income-delete" data-id="${inc.id}" title="Löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    <span class="expense-amount" style="color: var(--color-primary); cursor: pointer;" title="Klicken zum Bearbeiten">${formatCurrency(inc.amount)}</span>
+                    <button class="btn-secondary income-edit ${isEditing ? 'active' : ''}" data-id="${inc.id}" title="${isEditing ? 'Bearbeiten schließen' : 'Bearbeiten'}" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">
+                        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    </button>
+                    <button class="btn-danger income-delete" data-id="${inc.id}" title="Löschen">
+                        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
             `;
+            
+            if (isEditing) {
+                innerHtml += `
+                    <div class="inline-edit-popover">
+                        <div class="inline-edit-popover-header">
+                            <span class="inline-edit-badge" style="background: rgba(255, 179, 71, 0.2); color: #b35900;">
+                                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                Einnahme bearbeiten
+                            </span>
+                        </div>
+                        <form class="inline-edit-form" data-type="income" data-id="${inc.id}">
+                            <div class="inline-edit-grid">
+                                <div class="inline-edit-field field-name">
+                                    <label for="editIncName_${inc.id}">Beschreibung</label>
+                                    <input type="text" id="editIncName_${inc.id}" class="inline-edit-input" value="${escapeAttr(inc.name)}" required autocomplete="off">
+                                </div>
+                                <div class="inline-edit-field field-amount">
+                                    <label for="editIncAmount_${inc.id}">Betrag (€)</label>
+                                    <input type="number" id="editIncAmount_${inc.id}" class="inline-edit-input" step="0.01" min="0.01" value="${inc.amount}" required>
+                                </div>
+                            </div>
+                            <div class="inline-edit-actions">
+                                <button type="submit" class="btn-primary inline-save-btn" style="background-color: var(--color-secondary);">
+                                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Speichern
+                                </button>
+                                <button type="button" class="btn-secondary inline-cancel-btn" data-id="${inc.id}">
+                                    Abbrechen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            }
+            
+            li.innerHTML = innerHtml;
             dom.incomesList.appendChild(li);
         });
     }
@@ -376,19 +523,7 @@ function render() {
                 
                 // Add expenses for this category
                 categoryExpenses.forEach(exp => {
-                    const li = document.createElement('li');
-                    li.className = 'expense-item';
-                    li.innerHTML = `
-                        <div class="expense-info">
-                            <span class="expense-name">${exp.name}</span>
-                        </div>
-                        <div class="expense-actions">
-                            <span class="expense-amount">${formatCurrency(exp.amount)}</span>
-                            <button class="btn-secondary expense-edit" data-id="${exp.id}" title="Bearbeiten" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
-                            <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                        </div>
-                    `;
-                    dom.expensesList.appendChild(li);
+                    dom.expensesList.appendChild(renderExpenseItem(exp, categories, true));
                 });
             });
         } else {
@@ -403,20 +538,7 @@ function render() {
             }
             
             sortedExpenses.forEach(exp => {
-                const li = document.createElement('li');
-                li.className = 'expense-item';
-                li.innerHTML = `
-                    <div class="expense-info">
-                        <span class="expense-name">${exp.name}</span>
-                        <span class="expense-meta">${exp.category}</span>
-                    </div>
-                    <div class="expense-actions">
-                        <span class="expense-amount">${formatCurrency(exp.amount)}</span>
-                        <button class="btn-secondary expense-edit" data-id="${exp.id}" title="Bearbeiten" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
-                        <button class="btn-danger expense-delete" data-id="${exp.id}" title="Löschen"><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                    </div>
-                `;
-                dom.expensesList.appendChild(li);
+                dom.expensesList.appendChild(renderExpenseItem(exp, categories, false));
             });
         }
     }
@@ -427,6 +549,13 @@ function render() {
     
     // Save state to localStorage
     saveState();
+
+    // Auto-focus editing input if in edit mode
+    if (editingIncomeId) {
+        focusEditingInput('income', editingIncomeId);
+    } else if (editingExpenseId) {
+        focusEditingInput('expense', editingExpenseId);
+    }
 }
 
 function renderComparisonChart(totalIncome, totalExpenses) {
@@ -565,49 +694,93 @@ function renderChart(expenses, categories, totalExpenses) {
 
 // --- Event Listeners ---
 
-// Add or Update Income
+// Add Income (Formular ganz unten dient rein der Neuerfassung)
 dom.incomeForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = dom.incomeName.value.trim();
     const amount = parseFloat(dom.incomeAmount.value);
     
     if (name && !isNaN(amount)) {
-        if (editingIncomeId) {
-            const node = stateDoc.querySelector(`income[id="${editingIncomeId}"]`);
-            if (node) {
-                node.querySelector('name').textContent = name;
-                node.querySelector('amount').textContent = amount;
-            }
-            editingIncomeId = null;
-            dom.incomeForm.querySelector('button[type="submit"]').textContent = 'Einnahme speichern';
-        } else {
-            addIncomeXML(name, amount);
-        }
+        addIncomeXML(name, amount);
         dom.incomeName.value = '';
         dom.incomeAmount.value = '';
         render();
     }
 });
 
-// Remove or Edit Income (Event Delegation)
+// Incomes: Klick-Steuerung (Löschen, Inline-Bearbeiten, Betrag/Name-Klick, Abbrechen)
 dom.incomesList.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (btn) {
         const id = btn.getAttribute('data-id');
         if (btn.classList.contains('income-delete')) {
+            if (editingIncomeId === id) editingIncomeId = null;
             removeIncomeXML(id);
             render();
+            return;
         } else if (btn.classList.contains('income-edit')) {
-            const inc = getIncomes().find(i => i.id === id);
-            if (inc) {
-                dom.incomeName.value = inc.name;
-                dom.incomeAmount.value = inc.amount;
+            if (editingIncomeId === id) {
+                editingIncomeId = null;
+            } else {
                 editingIncomeId = id;
-                dom.incomeForm.querySelector('button[type="submit"]').textContent = 'Einnahme aktualisieren';
-                dom.incomeName.focus();
-                window.scrollTo({ top: dom.incomeForm.offsetTop - 100, behavior: 'smooth' });
+                editingExpenseId = null;
+            }
+            render();
+            return;
+        } else if (btn.classList.contains('inline-cancel-btn')) {
+            editingIncomeId = null;
+            render();
+            return;
+        }
+    }
+    
+    // Klick auf den Betrag oder die Beschreibung öffnet das Bearbeitungsfenster direkt unter dem Eintrag
+    const item = e.target.closest('.expense-item');
+    if (item && !e.target.closest('.inline-edit-popover') && !btn) {
+        const trigger = e.target.closest('.expense-amount') || e.target.closest('.expense-info');
+        if (trigger) {
+            const editBtn = item.querySelector('.income-edit');
+            if (editBtn) {
+                const id = editBtn.getAttribute('data-id');
+                if (id && editingIncomeId !== id) {
+                    editingIncomeId = id;
+                    editingExpenseId = null;
+                    render();
+                }
             }
         }
+    }
+});
+
+// Incomes: Inline-Formular absenden (Speichern)
+dom.incomesList.addEventListener('submit', (e) => {
+    const form = e.target.closest('.inline-edit-form');
+    if (form && form.getAttribute('data-type') === 'income') {
+        e.preventDefault();
+        const id = form.getAttribute('data-id');
+        const nameInput = form.querySelector(`#editIncName_${id}`);
+        const amountInput = form.querySelector(`#editIncAmount_${id}`);
+        
+        const name = nameInput ? nameInput.value.trim() : '';
+        const amount = amountInput ? parseFloat(amountInput.value) : NaN;
+        
+        if (name && !isNaN(amount)) {
+            const node = stateDoc.querySelector(`income[id="${id}"]`);
+            if (node) {
+                node.querySelector('name').textContent = name;
+                node.querySelector('amount').textContent = amount;
+            }
+            editingIncomeId = null;
+            render();
+        }
+    }
+});
+
+// Incomes: Escape bricht die Bearbeitung ab
+dom.incomesList.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && editingIncomeId) {
+        editingIncomeId = null;
+        render();
     }
 });
 
@@ -624,7 +797,7 @@ dom.categoryForm.addEventListener('submit', (e) => {
     }
 });
 
-// Add or Update Expense
+// Add Expense (Formular ganz unten dient rein der Neuerfassung)
 dom.expenseForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = dom.expenseName.value.trim();
@@ -632,18 +805,7 @@ dom.expenseForm.addEventListener('submit', (e) => {
     const category = dom.expenseCategorySelect.value;
     
     if (name && !isNaN(amount) && category) {
-        if (editingExpenseId) {
-            const node = stateDoc.querySelector(`expense[id="${editingExpenseId}"]`);
-            if (node) {
-                node.querySelector('name').textContent = name;
-                node.querySelector('amount').textContent = amount;
-                node.querySelector('category').textContent = category;
-            }
-            editingExpenseId = null;
-            dom.expenseForm.querySelector('button[type="submit"]').textContent = 'Ausgabe speichern';
-        } else {
-            addExpenseXML(name, amount, category);
-        }
+        addExpenseXML(name, amount, category);
         dom.expenseName.value = '';
         dom.expenseAmount.value = '';
         // keep category selected for quick multi-entry
@@ -651,26 +813,82 @@ dom.expenseForm.addEventListener('submit', (e) => {
     }
 });
 
-// Remove or Edit Expense (Event Delegation)
+// Expenses: Klick-Steuerung (Löschen, Inline-Bearbeiten, Betrag/Name-Klick, Abbrechen)
 dom.expensesList.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (btn) {
         const id = btn.getAttribute('data-id');
         if (btn.classList.contains('expense-delete') || btn.classList.contains('btn-danger')) {
+            if (editingExpenseId === id) editingExpenseId = null;
             removeExpenseXML(id);
             render();
+            return;
         } else if (btn.classList.contains('expense-edit')) {
-            const exp = getExpenses().find(x => x.id === id);
-            if (exp) {
-                dom.expenseName.value = exp.name;
-                dom.expenseAmount.value = exp.amount;
-                dom.expenseCategorySelect.value = exp.category;
+            if (editingExpenseId === id) {
+                editingExpenseId = null;
+            } else {
                 editingExpenseId = id;
-                dom.expenseForm.querySelector('button[type="submit"]').textContent = 'Ausgabe aktualisieren';
-                dom.expenseName.focus();
-                window.scrollTo({ top: dom.expenseForm.offsetTop - 100, behavior: 'smooth' });
+                editingIncomeId = null;
+            }
+            render();
+            return;
+        } else if (btn.classList.contains('inline-cancel-btn')) {
+            editingExpenseId = null;
+            render();
+            return;
+        }
+    }
+    
+    // Klick auf Betrag oder Info öffnet das Bearbeitungsfenster unmittelbar unter dem Eintrag
+    const item = e.target.closest('.expense-item');
+    if (item && !e.target.closest('.inline-edit-popover') && !btn) {
+        const trigger = e.target.closest('.expense-amount') || e.target.closest('.expense-info');
+        if (trigger) {
+            const editBtn = item.querySelector('.expense-edit');
+            if (editBtn) {
+                const id = editBtn.getAttribute('data-id');
+                if (id && editingExpenseId !== id) {
+                    editingExpenseId = id;
+                    editingIncomeId = null;
+                    render();
+                }
             }
         }
+    }
+});
+
+// Expenses: Inline-Formular absenden (Speichern)
+dom.expensesList.addEventListener('submit', (e) => {
+    const form = e.target.closest('.inline-edit-form');
+    if (form && form.getAttribute('data-type') === 'expense') {
+        e.preventDefault();
+        const id = form.getAttribute('data-id');
+        const nameInput = form.querySelector(`#editExpName_${id}`);
+        const amountInput = form.querySelector(`#editExpAmount_${id}`);
+        const categorySelect = form.querySelector(`#editExpCategory_${id}`);
+        
+        const name = nameInput ? nameInput.value.trim() : '';
+        const amount = amountInput ? parseFloat(amountInput.value) : NaN;
+        const category = categorySelect ? categorySelect.value : '';
+        
+        if (name && !isNaN(amount) && category) {
+            const node = stateDoc.querySelector(`expense[id="${id}"]`);
+            if (node) {
+                node.querySelector('name').textContent = name;
+                node.querySelector('amount').textContent = amount;
+                node.querySelector('category').textContent = category;
+            }
+            editingExpenseId = null;
+            render();
+        }
+    }
+});
+
+// Expenses: Escape bricht die Bearbeitung ab
+dom.expensesList.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && editingExpenseId) {
+        editingExpenseId = null;
+        render();
     }
 });
 
@@ -913,13 +1131,18 @@ if (authDom.sidebarBackdrop) {
     authDom.sidebarBackdrop.addEventListener('click', closeSidebar);
 }
 
-// Close sidebar / modals on Escape key
+// Close sidebar / modals / inline edit on Escape key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         closeSidebar();
         if (authDom.authModal) authDom.authModal.classList.remove('active');
         if (authDom.newScenarioModal) authDom.newScenarioModal.classList.remove('active');
         if (authDom.renameScenarioModal) authDom.renameScenarioModal.classList.remove('active');
+        if (editingIncomeId || editingExpenseId) {
+            editingIncomeId = null;
+            editingExpenseId = null;
+            render();
+        }
     }
 });
 
