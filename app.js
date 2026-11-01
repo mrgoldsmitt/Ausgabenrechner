@@ -318,6 +318,7 @@ function renderExpenseItem(exp, categories, isGrouped) {
         `;
     }
     
+    li.innerHTML = innerHtml;
     return li;
 }
 

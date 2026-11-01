@@ -1,6 +1,6 @@
 {
   "name": "ausgabenrechner",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Ausgabenrechner mit Cloudflare D1 und Ende-zu-Ende-Verschlüsselung",
   "scripts": {
     "dev": "npx wrangler pages dev . --d1 DB=ausgabenrechner-db",
